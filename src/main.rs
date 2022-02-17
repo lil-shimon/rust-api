@@ -1,16 +1,55 @@
-mod todo;
+#[macro_use]
+extern crate rocket;
 
-use actix_web::{get, web, App, HttpServer, Responder};
+use rocket::serde::json::Json;
+use serde::Serialize;
+use std::time::SystemTime;
+use std::net::{IpAddr, Ipv4Addr};
 
-#[get("/{id}/{name}/index.html")]
-async fn index(web::Path((id, name)): web::Path<(u32, String)>) -> impl Responder {
-    format!("Hello {}! id: {}", name, id)
+#[derive(Serialize)]
+struct NumberResponse {
+    number: u64,
+    is_prime_number: bool,
+    execution_time_in_micros: u128,
 }
 
-#[actix_web::main]
-async fn main() -> std::io::Result<()> {
-    HttpServer::new(|| App::new().service(todo::get_todo).service(todo::post_todo))
-        .bind("127.0.0.1:8000")?
-        .run()
-        .await
+#[get("/")]
+fn index() -> &'static str {
+    "This is my Rust prime number REST API"
+}
+
+#[get("/isPrime?<number>")]
+fn get_is_prime(number: u64) -> Json<NumberResponse> {
+    let now = SystemTime::now();
+
+    Json(NumberResponse {
+        number,
+        is_prime_number: is_prime(number),
+        execution_time_in_micros: now.elapsed().unwrap().as_micros(),
+    })
+}
+
+fn is_prime(n: u64) -> bool {
+    if n <= 1 {
+        return false;
+    }
+
+    for a in 2..n {
+        if n % a == 0 {
+            return false;
+        }
+    }
+    true
+}
+
+#[rocket::main]
+async fn main() {
+    let mut config = rocket::config::Config::default();
+    config.address = IpAddr::V4(Ipv4Addr::new(0, 0, 0, 0));
+
+    let _ = rocket::build()
+        .configure(config)
+        .mount("/", routes![index, get_is_prime])
+        .launch()
+        .await;
 }
