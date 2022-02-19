@@ -19,7 +19,6 @@ jobs:
           buildpack: "https://github.com/emk/heroku-buildpack-rust.git"
           usedocker: true
           appdir: server
-          healthcheck: "https://lil-rust-api.herokuapp.com/health"
           checkstring: "Ok"
           rollbackonhealthcheckfailed: true
       - run: |
