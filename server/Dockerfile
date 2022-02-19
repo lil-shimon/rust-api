@@ -19,4 +19,4 @@ FROM rust:1.57.0-slim-buster as prod
 RUN apt-get update
 RUN apt-get install libpq-dev -y
 COPY --from=build /app/target/release/rust-api .
-CMD [ "./rust-api" ]
+CMD [ "/rust-api" ]
