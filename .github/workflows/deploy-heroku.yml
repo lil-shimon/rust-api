@@ -1,0 +1,26 @@
+name: Deploy to heroku
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: akhileshns/heroku-deploy@v3.12.12
+        with:
+          heroku_api_key: ${{secrets.HEROKU_API_KEY}}
+          heroku_app_name: "rust-web-api-server-sample"
+          heroku_email: ${{secrets.HEROKU_EMAIL}}
+          buildpack: "https://github.com/emk/heroku-buildpack-rust.git"
+          usedocker: true
+          appdir: server
+          healthcheck: "https://rust-web-api-server-sample.herokuapp.com/health"
+          checkstring: "Ok"
+          rollbackonhealthcheckfailed: true
+      - run: |
+          heroku config:set SERVER_ADDRESS=0.0.0.0
