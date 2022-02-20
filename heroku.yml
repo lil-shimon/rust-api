@@ -9,4 +9,4 @@ build:
 release:
   image: migration
   command:
-    diesel setup
+    - diesel setup
