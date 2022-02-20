@@ -1,4 +1,4 @@
-use actix_web::{web, App, HttpResponse, HttpServer, Responder};
+use actix_web::{App, HttpServer};
 use rust_api::routes;
 
 #[actix_rt::main]
